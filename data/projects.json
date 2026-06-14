@@ -1,0 +1,42 @@
+[
+  {
+    "id": "9fbbd380-6f1f-4a29-a536-dce86faffead",
+    "name": "NeonPulse",
+    "path": "https://neon-vigilant-pulse-fit.base44.app",
+    "color": "#b51a00",
+    "image": "/projects/c5206e2d-5d27-4080-95a5-43cf07d27c7c.png",
+    "order": 0
+  },
+  {
+    "id": "51abeb06-ea7d-4e1d-85bb-65f615a955ef",
+    "name": "StarMie",
+    "path": "https://www.starmie.pt/",
+    "color": "#7b219f",
+    "image": "/projects/3b83ef6f-dcec-4fd6-87bf-cde5b2a84509.jpg",
+    "order": 1
+  },
+  {
+    "id": "64c1fbbe-8861-4721-897e-6d190a5af1d7",
+    "name": "MagiCard",
+    "path": "https://www.magicard.tech",
+    "color": "#ffaa00",
+    "image": "/projects/9883a81b-4cc3-4390-8d0a-3c97a4fe9c7a.png",
+    "order": 2
+  },
+  {
+    "id": "aff29663-e685-4567-88d8-0e57fdafc9d3",
+    "name": "Portefólio",
+    "path": "https://www.joaosousa.space",
+    "color": "#5c0700",
+    "image": "/projects/5d80c6ab-c112-4699-8dbc-2ebcc3b8c283.jpg",
+    "order": 3
+  },
+  {
+    "id": "9998921c-ccb7-46be-9619-1fecf0e994bf",
+    "name": "GymCraft",
+    "path": "https://gym-craft-website.vercel.app",
+    "color": "#96d35f",
+    "image": "/projects/c7df6b32-f35e-4d7d-908f-b531fef1763b.png",
+    "order": 4
+  }
+]
