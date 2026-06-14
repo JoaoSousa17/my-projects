@@ -12,8 +12,8 @@ export const metadata: Metadata = {
     title: "My Projects",
   },
   icons: {
-    icon: "/icon-192.png",
-    apple: "/icon-192.png",
+    icon: "/icon-192_round.png",
+    apple: "/icon-192_round.png",
   },
 };
 

@@ -31,12 +31,16 @@
   * {
     @apply border-border;
   }
+  html {
+    background-color: #000;
+  }
   html,
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     min-height: 100%;
   }
   body {
+    background-color: transparent;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;
   }
