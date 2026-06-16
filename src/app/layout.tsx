@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "../app/globals.css";
-import { AnimatedBackground } from "@/components/animated-background";
 
 export const metadata: Metadata = {
   title: "My Projects",
@@ -30,7 +29,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt" className="dark">
-      <body className="relative min-h-svh antialiased">
+      <body className="relative min-h-svh antialiased bg-[url('/bg.avif')] bg-cover bg-center bg-no-repeat bg-fixed">
         {children}
         <script
           dangerouslySetInnerHTML={{
