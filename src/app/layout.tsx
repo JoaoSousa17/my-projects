@@ -31,7 +31,6 @@ export default function RootLayout({
   return (
     <html lang="pt" className="dark">
       <body className="relative min-h-svh antialiased">
-        <AnimatedBackground />
         {children}
         <script
           dangerouslySetInnerHTML={{
