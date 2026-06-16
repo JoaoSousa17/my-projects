@@ -7,6 +7,8 @@ import { useEffect, useRef } from "react";
  * partículas a fluir num campo vetorial (flow field) e ligações subtis entre
  * pontos próximos. Mede pela window (innerWidth/innerHeight) para evitar o caso
  * em que clientWidth/clientHeight do canvas devolvem 0 e nada é desenhado.
+ * 
+ * Otimizado para evitar sobrecarga de CPU (Commit bottleneck no browser).
  */
 export function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -23,7 +25,9 @@ export function AnimatedBackground() {
     let w = 0;
     let h = 0;
     let t = 0;
-    const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+    
+    // Limitado o DPR a 1.2 em vez de 1.5 para aliviar o fill-rate do GPU/CPU em ecrãs Retina
+    const DPR = Math.min(window.devicePixelRatio || 1, 1.2);
     const isMobile = () => w < 768;
 
     // Brumas / aurora a deslizar
@@ -40,13 +44,13 @@ export function AnimatedBackground() {
     let blobs: Blob[] = [];
 
     function makeBlobs() {
-      const count = isMobile() ? 4 : 6;
+      const count = isMobile() ? 3 : 5; // Reduzido ligeiramente a contagem
       blobs = Array.from({ length: count }, (_, i) => ({
         xF: Math.random(),
         yF: Math.random(),
         r: (isMobile() ? 220 : 340) + Math.random() * 200,
-        driftX: (Math.random() - 0.5) * 0.00018,
-        driftY: (Math.random() - 0.5) * 0.00018,
+        driftX: (Math.random() - 0.5) * 0.00015,
+        driftY: (Math.random() - 0.5) * 0.00015,
         phase: Math.random() * Math.PI * 2,
         hue: blobHues[i % blobHues.length],
       }));
@@ -61,14 +65,15 @@ export function AnimatedBackground() {
         x: Math.random() * w,
         y: Math.random() * h,
         vx: 0, vy: 0,
-        r: Math.random() * 1.6 + 0.5,
+        r: Math.random() * 1.8 + 0.6, // Ligeiramente maiores para compensar a menor densidade
         life: Math.random() * 400 + 200,
       };
     }
 
     function makeParticles() {
-      const count = Math.min(isMobile() ? 50 : 120, Math.floor((w * h) / 12000));
-      particles = Array.from({ length: Math.max(count, 30) }, () => spawnParticle());
+      // Otimização crucial: Aumentado o rácio divisor para limitar o número máximo de partículas
+      const count = Math.min(isMobile() ? 35 : 70, Math.floor((w * h) / 25000));
+      particles = Array.from({ length: Math.max(count, 20) }, () => spawnParticle());
     }
 
     function flowAngle(x: number, y: number) {
@@ -115,6 +120,8 @@ export function AnimatedBackground() {
     }
 
     function drawParticles() {
+      // 1. Desenhar e atualizar as partículas individualmente
+      ctx.fillStyle = "rgba(200,200,212,0.45)";
       for (const p of particles) {
         const a = flowAngle(p.x, p.y);
         p.vx += Math.cos(a) * 0.06;
@@ -132,28 +139,32 @@ export function AnimatedBackground() {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(200,200,212,0.5)";
         ctx.fill();
       }
 
-      const maxDist = isMobile() ? 90 : 120;
+      // 2. Desenhar as linhas de ligação num único "Batch stroke" (Mega Otimização para o Commit)
+      const maxDist = isMobile() ? 80 : 110;
+      const maxDistSq = maxDist * maxDist; // Usar distância ao quadrado evita Math.hypot pesado
+      
+      ctx.beginPath(); // Abre um único caminho global para as linhas
+      ctx.strokeStyle = "rgba(175,175,190,0.06)"; // Opacidade média fixa para evitar recriar strokeStyle em loop
+      ctx.lineWidth = 0.5;
+
       for (let i = 0; i < particles.length; i++) {
+        const a = particles[i];
         for (let j = i + 1; j < particles.length; j++) {
-          const a = particles[i];
           const b = particles[j];
           const dx = a.x - b.x;
           const dy = a.y - b.y;
-          const dist = Math.hypot(dx, dy);
-          if (dist < maxDist) {
-            ctx.beginPath();
+          const distSq = dx * dx + dy * dy; // Comparação puramente matemática ultra rápida
+
+          if (distSq < maxDistSq) {
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(175,175,190,${(0.12 * (1 - dist / maxDist)).toFixed(3)})`;
-            ctx.lineWidth = 0.6;
-            ctx.stroke();
           }
         }
       }
+      ctx.stroke(); // Executa o commit de todas as linhas de uma só vez!
     }
 
     function frame() {
@@ -165,7 +176,6 @@ export function AnimatedBackground() {
     }
 
     function resize() {
-      // Medir pela window evita clientWidth/clientHeight = 0 antes do layout.
       w = window.innerWidth;
       h = window.innerHeight;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -176,7 +186,6 @@ export function AnimatedBackground() {
 
     function start() {
       resize();
-      // se ainda não houver dimensões, tenta de novo no próximo frame
       if (w === 0 || h === 0) {
         raf = requestAnimationFrame(start);
         return;
@@ -195,11 +204,10 @@ export function AnimatedBackground() {
         makeBlobs();
         makeParticles();
         frame();
-      }, 120);
+      }, 150);
     };
 
     window.addEventListener("resize", onResize);
-    // arranque diferido para garantir layout resolvido
     raf = requestAnimationFrame(start);
 
     return () => {
