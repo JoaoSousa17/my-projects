@@ -21,6 +21,7 @@ export type ProjectDraft = {
   color: string;
   image: string;
   icon?: string;
+  comingSoon?: boolean;
 };
 
 export function ProjectDialog({
@@ -41,6 +42,7 @@ export function ProjectDialog({
   const [color, setColor] = useState("#22d3ee");
   const [image, setImage] = useState("");
   const [icon, setIcon] = useState("");
+  const [comingSoon, setComingSoon] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -53,6 +55,7 @@ export function ProjectDialog({
       setColor(initial?.color ?? "#22d3ee");
       setImage(initial?.image ?? "");
       setIcon(initial?.icon ?? "");
+      setComingSoon(initial?.comingSoon ?? false);
       setError("");
     }
   }, [open, initial]);
@@ -87,7 +90,14 @@ export function ProjectDialog({
     setSaving(true);
     setError("");
     try {
-      await onSave({ name: name.trim(), path: path.trim(), color, image, icon: icon.trim() || undefined });
+      await onSave({
+        name: name.trim(),
+        path: path.trim(),
+        color,
+        image,
+        icon: icon.trim() || undefined,
+        comingSoon,
+      });
       onOpenChange(false);
     } catch {
       setError("Não foi possível guardar.");
@@ -193,6 +203,19 @@ export function ProjectDialog({
                 className="border-white/15 bg-black/40"
               />
             </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                id="p-coming-soon"
+                type="checkbox"
+                checked={comingSoon}
+                onChange={(e) => setComingSoon(e.target.checked)}
+                className="h-4 w-4 cursor-pointer rounded border-white/15 bg-black/40 accent-cyan-500"
+              />
+              <Label htmlFor="p-coming-soon" className="cursor-pointer">
+                No futuro
+              </Label>
+            </div>
           </div>
 
           {/* Preview ao vivo */}
@@ -200,7 +223,13 @@ export function ProjectDialog({
             <span className="text-xs text-muted-foreground">Pré-visualização</span>
             <div className="w-32">
               <ProjectTile
-                project={{ name: name || "Projeto", color, image, icon: icon || undefined }}
+                project={{
+                  name: name || "Projeto",
+                  color,
+                  image,
+                  icon: icon || undefined,
+                  comingSoon,
+                }}
               />
             </div>
           </div>

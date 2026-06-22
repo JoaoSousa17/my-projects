@@ -26,6 +26,7 @@ export async function POST(req: Request) {
     color: String(body.color || "#22d3ee"),
     image: String(body.image || ""),
     icon: body.icon ? String(body.icon) : undefined,
+    comingSoon: Boolean(body.comingSoon),
     order: projects.length,
   };
   projects.push(project);

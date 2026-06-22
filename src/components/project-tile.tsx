@@ -4,6 +4,7 @@ import Image from "next/image";
 import * as Icons from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Project } from "@/lib/projects";
+import { HOME_STRINGS, type Lang } from "@/lib/i18n";
 
 type IconName = keyof typeof Icons;
 
@@ -12,11 +13,13 @@ export function ProjectTile({
   className,
   asButton = false,
   children,
+  lang = "pt",
 }: {
-  project: Pick<Project, "name" | "color" | "image" | "icon">;
+  project: Pick<Project, "name" | "color" | "image" | "icon" | "comingSoon">;
   className?: string;
   asButton?: boolean;
   children?: React.ReactNode; // overlay controls (manage)
+  lang?: Lang;
 }) {
   const color = project.color || "#22d3ee";
   const LucideIcon =
@@ -76,6 +79,14 @@ export function ProjectTile({
           {project.name}
         </span>
       </div>
+
+      {project.comingSoon && (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <span className="absolute left-1/2 top-1/2 w-[150%] -translate-x-1/2 -translate-y-1/2 rotate-[-35deg] bg-amber-500 py-1 text-center text-[0.65rem] font-bold uppercase tracking-wide text-black shadow-md sm:text-xs">
+            {HOME_STRINGS[lang].comingSoon}
+          </span>
+        </div>
+      )}
 
       {children}
     </div>

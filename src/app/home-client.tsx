@@ -38,21 +38,31 @@ export function HomeClient({ projects }: { projects: Project[] }) {
         <div className="grid w-full grid-cols-2 gap-4 sm:gap-6">
           {projects.map((p, i) => {
             const lastOdd = isOdd && i === projects.length - 1;
+            const tileClassName = cn(
+              "block focus:outline-none",
+              // quando é o último de um total ímpar, ocupa as 2 colunas
+              // e centra-se, mantendo a largura de uma só coluna
+              lastOdd &&
+                "col-span-2 mx-auto w-[calc(50%-0.5rem)] sm:w-[calc(50%-0.75rem)]"
+            );
+
+            if (p.comingSoon) {
+              return (
+                <div key={p.id} className={tileClassName}>
+                  <ProjectTile project={p} lang={lang} />
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={p.id}
                 href={p.path || "#"}
                 target={p.path?.startsWith("http") ? "_blank" : undefined}
                 rel="noopener noreferrer"
-                className={cn(
-                  "block focus:outline-none",
-                  // quando é o último de um total ímpar, ocupa as 2 colunas
-                  // e centra-se, mantendo a largura de uma só coluna
-                  lastOdd &&
-                    "col-span-2 mx-auto w-[calc(50%-0.5rem)] sm:w-[calc(50%-0.75rem)]"
-                )}
+                className={tileClassName}
               >
-                <ProjectTile project={p} asButton />
+                <ProjectTile project={p} asButton lang={lang} />
               </Link>
             );
           })}
