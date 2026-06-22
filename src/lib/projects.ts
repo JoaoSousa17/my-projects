@@ -8,6 +8,7 @@ export type Project = {
   color: string; // hex, e.g. #22d3ee
   image: string; // path em /public, e.g. /projects/abc.png
   icon?: string; // nome de um ícone lucide (fallback se não houver imagem)
+  comingSoon?: boolean; // projeto "no futuro" — ainda em construção
   order: number;
 };
 
