@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -111,6 +112,9 @@ export function ProjectDialog({
       <DialogContent className="max-h-[90svh] overflow-y-auto scrollbar-none">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>
+            Preenche os dados do projeto e guarda.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-5 sm:grid-cols-[1fr_140px]">
