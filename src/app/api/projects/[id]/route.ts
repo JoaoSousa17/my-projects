@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
+import { del } from "@vercel/blob";
 import { isAuthed } from "@/lib/auth";
 import { readProjects, writeProjects } from "@/lib/projects";
 
@@ -46,10 +45,9 @@ export async function DELETE(
   const target = projects.find((p) => p.id === id);
   const next = projects.filter((p) => p.id !== id);
 
-  // tenta apagar a imagem associada (se estiver em /public/projects)
-  if (target?.image?.startsWith("/projects/")) {
-    const filePath = path.join(process.cwd(), "public", target.image);
-    await fs.unlink(filePath).catch(() => {});
+  // tenta apagar a imagem associada no Vercel Blob
+  if (target?.image?.includes("blob.vercel-storage.com")) {
+    await del(target.image).catch(() => {});
   }
 
   await writeProjects(next);

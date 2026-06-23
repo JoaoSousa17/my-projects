@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
+import { put } from "@vercel/blob";
 import { randomUUID } from "crypto";
 import { isAuthed } from "@/lib/auth";
 
@@ -40,13 +39,14 @@ export async function POST(req: Request) {
       );
     }
 
-    const dir = path.join(process.cwd(), "public", "projects");
-    await fs.mkdir(dir, { recursive: true });
-    const filename = `${randomUUID()}.${ext}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(path.join(dir, filename), buffer);
+    const pathname = `projects/${randomUUID()}.${ext}`;
+    const blob = await put(pathname, file, {
+      access: "public",
+      addRandomSuffix: false,
+      contentType: file.type,
+    });
 
-    return NextResponse.json({ ok: true, path: `/projects/${filename}` });
+    return NextResponse.json({ ok: true, path: blob.url });
   } catch (err) {
     console.error("Erro no upload:", err);
     const message = err instanceof Error ? err.message : "Erro desconhecido";
