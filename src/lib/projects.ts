@@ -1,34 +1,31 @@
-import { promises as fs } from "fs";
-import path from "path";
+import { put, list } from "@vercel/blob";
 
 export type Project = {
   id: string;
   name: string;
   path: string; // link do projeto
   color: string; // hex, e.g. #22d3ee
-  image: string; // path em /public, e.g. /projects/abc.png
+  image: string; // URL do Vercel Blob
   icon?: string; // nome de um ícone lucide (fallback se não houver imagem)
   comingSoon?: boolean; // projeto "no futuro" — ainda em construção
   order: number;
 };
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DATA_FILE = path.join(DATA_DIR, "projects.json");
+const PROJECTS_PATHNAME = "data/projects.json";
 
-async function ensureFile() {
-  try {
-    await fs.access(DATA_FILE);
-  } catch {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    await fs.writeFile(DATA_FILE, JSON.stringify([], null, 2), "utf-8");
-  }
+async function findProjectsBlobUrl(): Promise<string | null> {
+  const { blobs } = await list({ prefix: PROJECTS_PATHNAME });
+  const match = blobs.find((b) => b.pathname === PROJECTS_PATHNAME);
+  return match?.url ?? null;
 }
 
 export async function readProjects(): Promise<Project[]> {
-  await ensureFile();
-  const raw = await fs.readFile(DATA_FILE, "utf-8");
+  const url = await findProjectsBlobUrl();
+  if (!url) return [];
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) return [];
   try {
-    const parsed = JSON.parse(raw) as Project[];
+    const parsed = (await res.json()) as Project[];
     return [...parsed].sort((a, b) => a.order - b.order);
   } catch {
     return [];
@@ -36,7 +33,11 @@ export async function readProjects(): Promise<Project[]> {
 }
 
 export async function writeProjects(projects: Project[]): Promise<void> {
-  await ensureFile();
   const normalized = projects.map((p, i) => ({ ...p, order: i }));
-  await fs.writeFile(DATA_FILE, JSON.stringify(normalized, null, 2), "utf-8");
+  await put(PROJECTS_PATHNAME, JSON.stringify(normalized, null, 2), {
+    access: "public",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: "application/json",
+  });
 }
