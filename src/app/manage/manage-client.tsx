@@ -96,6 +96,7 @@ export function ManageClient({ initialProjects }: { initialProjects: Project[] }
   const [editing, setEditing] = useState<Project | null>(null);
   const [deleting, setDeleting] = useState<Project | null>(null);
   const [busy, setBusy] = useState(false);
+  const [reorderError, setReorderError] = useState("");
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -103,22 +104,30 @@ export function ManageClient({ initialProjects }: { initialProjects: Project[] }
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  async function persistOrder(next: Project[]) {
-    await fetch("/api/projects/reorder", {
+  async function persistOrder(next: Project[], previous: Project[]) {
+    const res = await fetch("/api/projects/reorder", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids: next.map((p) => p.id) }),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setReorderError(data.error || "Não foi possível guardar a nova ordem.");
+      setProjects(previous);
+      return;
+    }
+    setReorderError("");
   }
 
   function onDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
+    const previous = projects;
     setProjects((items) => {
       const oldIndex = items.findIndex((i) => i.id === active.id);
       const newIndex = items.findIndex((i) => i.id === over.id);
       const next = arrayMove(items, oldIndex, newIndex);
-      persistOrder(next);
+      persistOrder(next, previous);
       return next;
     });
   }
@@ -201,6 +210,9 @@ export function ManageClient({ initialProjects }: { initialProjects: Project[] }
         >
           <Plus className="h-4 w-4" /> Adicionar projeto
         </Button>
+        {reorderError && (
+          <p className="mt-2 text-sm text-red-400">{reorderError}</p>
+        )}
       </section>
 
       {/* Secção: Editar / Eliminar / Reordenar — preview interativo */}
