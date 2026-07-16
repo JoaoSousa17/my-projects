@@ -15,7 +15,7 @@ export function ProjectTile({
   children,
   lang = "pt",
 }: {
-  project: Pick<Project, "name" | "color" | "image" | "icon" | "comingSoon">;
+  project: Pick<Project, "name" | "color" | "image" | "icon" | "comingSoon" | "inPlanning">;
   className?: string;
   asButton?: boolean;
   children?: React.ReactNode; // overlay controls (manage)
@@ -80,10 +80,18 @@ export function ProjectTile({
         </span>
       </div>
 
-      {project.comingSoon && (
+      {(project.comingSoon || project.inPlanning) && (
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <span className="absolute left-1/2 top-1/2 w-[150%] -translate-x-1/2 -translate-y-1/2 rotate-[-35deg] bg-amber-500 py-1 text-center text-[0.65rem] font-bold uppercase tracking-wide text-black shadow-md sm:text-xs">
-            {HOME_STRINGS[lang].comingSoon}
+          <span
+            className={`absolute left-1/2 top-1/2 w-[150%] -translate-x-1/2 -translate-y-1/2 rotate-[-35deg] py-1 text-center text-[0.65rem] font-bold uppercase tracking-wide shadow-md sm:text-xs ${
+              project.comingSoon
+                ? "bg-amber-500 text-black"
+                : "bg-violet-600 text-white"
+            }`}
+          >
+            {project.comingSoon
+              ? HOME_STRINGS[lang].comingSoon
+              : HOME_STRINGS[lang].inPlanning}
           </span>
         </div>
       )}

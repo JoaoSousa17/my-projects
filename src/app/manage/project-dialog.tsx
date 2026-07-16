@@ -23,6 +23,7 @@ export type ProjectDraft = {
   image: string;
   icon?: string;
   comingSoon?: boolean;
+  inPlanning?: boolean;
 };
 
 export function ProjectDialog({
@@ -44,6 +45,7 @@ export function ProjectDialog({
   const [image, setImage] = useState("");
   const [icon, setIcon] = useState("");
   const [comingSoon, setComingSoon] = useState(false);
+  const [inPlanning, setInPlanning] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -57,6 +59,7 @@ export function ProjectDialog({
       setImage(initial?.image ?? "");
       setIcon(initial?.icon ?? "");
       setComingSoon(initial?.comingSoon ?? false);
+      setInPlanning(initial?.inPlanning ?? false);
       setError("");
     }
   }, [open, initial]);
@@ -98,6 +101,7 @@ export function ProjectDialog({
         image,
         icon: icon.trim() || undefined,
         comingSoon,
+        inPlanning,
       });
       onOpenChange(false);
     } catch {
@@ -213,11 +217,24 @@ export function ProjectDialog({
                 id="p-coming-soon"
                 type="checkbox"
                 checked={comingSoon}
-                onChange={(e) => setComingSoon(e.target.checked)}
-                className="h-4 w-4 cursor-pointer rounded border-white/15 bg-black/40 accent-cyan-500"
+                onChange={(e) => { setComingSoon(e.target.checked); if (e.target.checked) setInPlanning(false); }}
+                className="h-4 w-4 cursor-pointer rounded border-white/15 bg-black/40 accent-amber-500"
               />
               <Label htmlFor="p-coming-soon" className="cursor-pointer">
-                No futuro
+                Em Construção
+              </Label>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                id="p-in-planning"
+                type="checkbox"
+                checked={inPlanning}
+                onChange={(e) => { setInPlanning(e.target.checked); if (e.target.checked) setComingSoon(false); }}
+                className="h-4 w-4 cursor-pointer rounded border-white/15 bg-black/40 accent-violet-500"
+              />
+              <Label htmlFor="p-in-planning" className="cursor-pointer">
+                Em Planeamento
               </Label>
             </div>
           </div>
@@ -233,6 +250,7 @@ export function ProjectDialog({
                   image,
                   icon: icon || undefined,
                   comingSoon,
+                  inPlanning,
                 }}
               />
             </div>

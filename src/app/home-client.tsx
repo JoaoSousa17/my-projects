@@ -46,7 +46,7 @@ export function HomeClient({ projects }: { projects: Project[] }) {
                 "col-span-2 mx-auto w-[calc(50%-0.5rem)] sm:w-[calc(50%-0.75rem)]"
             );
 
-            if (p.comingSoon) {
+            if (p.comingSoon || p.inPlanning) {
               return (
                 <div key={p.id} className={tileClassName}>
                   <ProjectTile project={p} lang={lang} />

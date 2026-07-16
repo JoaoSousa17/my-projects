@@ -29,7 +29,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt" className="dark">
-      <body className="relative min-h-svh antialiased bg-[url('/bg.avif')] bg-cover bg-center bg-no-repeat bg-fixed">
+      <body className="relative min-h-svh antialiased">
+        {/* Fundo separado em div fixed — bg-fixed no body quebra em Safari PWA */}
+        <div className="fixed inset-0 -z-10 bg-[url('/bg.avif')] bg-cover bg-center bg-no-repeat" aria-hidden="true" />
         {children}
         <script
           dangerouslySetInnerHTML={{
