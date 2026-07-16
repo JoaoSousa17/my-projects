@@ -7,7 +7,8 @@ export type Project = {
   color: string; // hex, e.g. #22d3ee
   image: string; // URL do Vercel Blob
   icon?: string; // nome de um ícone lucide (fallback se não houver imagem)
-  comingSoon?: boolean; // projeto "no futuro" — ainda em construção
+  comingSoon?: boolean;  // Em Construção
+  inPlanning?: boolean;  // Em Planeamento
   order: number;
 };
 

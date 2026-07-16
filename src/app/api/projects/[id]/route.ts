@@ -28,6 +28,7 @@ export async function PATCH(
     image: body.image !== undefined ? String(body.image) : current.image,
     icon: body.icon !== undefined ? (body.icon ? String(body.icon) : undefined) : current.icon,
     comingSoon: body.comingSoon !== undefined ? Boolean(body.comingSoon) : current.comingSoon,
+    inPlanning: body.inPlanning !== undefined ? Boolean(body.inPlanning) : current.inPlanning,
   };
   await writeProjects(projects);
   return NextResponse.json({ ok: true, project: projects[idx] });

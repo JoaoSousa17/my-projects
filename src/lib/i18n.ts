@@ -6,6 +6,7 @@ export const HOME_STRINGS: Record<Lang, {
   empty: string;
   admin: string;
   comingSoon: string;
+  inPlanning: string;
 }> = {
   pt: {
     title: "Meus Projetos",
@@ -13,6 +14,7 @@ export const HOME_STRINGS: Record<Lang, {
     empty: "Ainda não há projetos. Adiciona alguns na gestão.",
     admin: "Gestão",
     comingSoon: "Em Construção",
+    inPlanning: "Em Planeamento",
   },
   en: {
     title: "My Projects",
@@ -20,5 +22,6 @@ export const HOME_STRINGS: Record<Lang, {
     empty: "No projects yet. Add some in the management area.",
     admin: "Manage",
     comingSoon: "Under Construction",
+    inPlanning: "In Planning",
   },
 };

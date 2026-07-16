@@ -27,6 +27,7 @@ export async function POST(req: Request) {
     image: String(body.image || ""),
     icon: body.icon ? String(body.icon) : undefined,
     comingSoon: Boolean(body.comingSoon),
+    inPlanning: Boolean(body.inPlanning),
     order: projects.length,
   };
   projects.push(project);
