@@ -14,15 +14,24 @@ export type Project = {
 
 const PROJECTS_PATHNAME = "data/projects.json";
 
-async function findProjectsBlobUrl(): Promise<string | null> {
-  const { blobs } = await list({ prefix: PROJECTS_PATHNAME });
-  const match = blobs.find((b) => b.pathname === PROJECTS_PATHNAME);
-  return match?.url ?? null;
+// Cache em memória: evita chamar list() mais do que uma vez por instância
+// serverless. undefined = ainda não resolvido; null = ficheiro não existe.
+let cachedUrl: string | null | undefined = undefined;
+
+async function getProjectsUrl(): Promise<string | null> {
+  if (cachedUrl !== undefined) return cachedUrl;
+  try {
+    const { blobs } = await list({ prefix: PROJECTS_PATHNAME });
+    cachedUrl = blobs.find((b) => b.pathname === PROJECTS_PATHNAME)?.url ?? null;
+  } catch {
+    cachedUrl = null;
+  }
+  return cachedUrl;
 }
 
 export async function readProjects(): Promise<Project[]> {
   try {
-    const url = await findProjectsBlobUrl();
+    const url = await getProjectsUrl();
     if (!url) return [];
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return [];
@@ -35,10 +44,12 @@ export async function readProjects(): Promise<Project[]> {
 
 export async function writeProjects(projects: Project[]): Promise<void> {
   const normalized = projects.map((p, i) => ({ ...p, order: i }));
-  await put(PROJECTS_PATHNAME, JSON.stringify(normalized, null, 2), {
+  const result = await put(PROJECTS_PATHNAME, JSON.stringify(normalized, null, 2), {
     access: "public",
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: "application/json",
   });
+  // Atualiza o cache com o URL retornado pelo put() — sem list() necessário
+  cachedUrl = result.url;
 }
