@@ -21,11 +21,11 @@ async function findProjectsBlobUrl(): Promise<string | null> {
 }
 
 export async function readProjects(): Promise<Project[]> {
-  const url = await findProjectsBlobUrl();
-  if (!url) return [];
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) return [];
   try {
+    const url = await findProjectsBlobUrl();
+    if (!url) return [];
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return [];
     const parsed = (await res.json()) as Project[];
     return [...parsed].sort((a, b) => a.order - b.order);
   } catch {

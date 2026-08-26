@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { del } from "@vercel/blob";
 import { isAuthed } from "@/lib/auth";
 import { readProjects, writeProjects } from "@/lib/projects";
@@ -31,6 +32,7 @@ export async function PATCH(
     inPlanning: body.inPlanning !== undefined ? Boolean(body.inPlanning) : current.inPlanning,
   };
   await writeProjects(projects);
+  revalidatePath("/");
   return NextResponse.json({ ok: true, project: projects[idx] });
 }
 
@@ -52,5 +54,6 @@ export async function DELETE(
   }
 
   await writeProjects(next);
+  revalidatePath("/");
   return NextResponse.json({ ok: true });
 }
