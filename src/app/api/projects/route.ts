@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { isAuthed } from "@/lib/auth";
 import { readProjects, writeProjects, type Project } from "@/lib/projects";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  const projects = await readProjects();
-  return NextResponse.json(projects);
-}
+// GET removido: não é usado internamente e era um vetor de Advanced Ops
+// sem autenticação (qualquer bot podia chamar list() através dele).
 
 export async function POST(req: Request) {
   if (!(await isAuthed())) {
@@ -32,5 +31,6 @@ export async function POST(req: Request) {
   };
   projects.push(project);
   await writeProjects(projects);
+  revalidatePath("/");
   return NextResponse.json({ ok: true, project });
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { isAuthed } from "@/lib/auth";
 import { readProjects, writeProjects } from "@/lib/projects";
 
@@ -26,6 +27,7 @@ export async function POST(req: Request) {
     }
 
     await writeProjects(reordered);
+    revalidatePath("/");
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("Erro ao reordenar:", err);
